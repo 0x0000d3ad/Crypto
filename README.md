@@ -5,7 +5,7 @@ Code for generating wallets and interacting with contracts.  This is not intende
 Unless otherwise specified, it is assumed that all data such as abi files and config files will be stored in the data/ directory.  In particular, config.json contains data that you will need to connect to your instance of infura, or specify contract or wallet addresses.
 
 ## Config and .secret files
-As mentioned above, the config file, config.json, contains all necessary information and links, such as infura links and your etherscan key.  Also, make sure you include a .secret file.  DO NOT commit this file or otherwise save it.  For more information on best practices for securing your seed phrase, (read more here)[https://www.ledger.com/blog/how-to-protect-your-seed-phrase].
+As mentioned above, the config file, config.json, contains all necessary information and links, such as infura links and your etherscan key.  Also, make sure you include a .secret file.  DO NOT commit this file or otherwise save it.  For more information on best practices for securing your seed phrase, [read more here](https://www.ledger.com/blog/how-to-protect-your-seed-phrase).
 
 ## BIP32 and BIP39
 These .py files contain the code necessary to produce wallets, including private and public keys as well as mnemonics.  Always protect your private key!
