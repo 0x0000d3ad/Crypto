@@ -1,0 +1,11 @@
+base58
+bip32utils
+bitarray
+coincurve
+ecdsa
+ethtoken
+eth_utils>=1.2.0
+mnemonic
+pyetherbalance
+secrets
+web3
