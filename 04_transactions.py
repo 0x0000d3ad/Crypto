@@ -43,11 +43,22 @@ if __name__ == "__main__" :
     with open( "results/transactions.json", 'r' ) as f :
         transactions_json = json.load( f )
 
+    st = "sliced_transactions.txt"
+    sliced = None
+    if os.path.exists( st ) :
+        with open( st, 'r' ) as f :
+            sliced = [ i.strip() for i in f.readlines() ]
+        print( len( sliced ) )
+
     minters = {}
     index = 0
     for transaction in transactions_json[ "result" ] :
-        wallet_address = transaction[ "from" ]
+        wallet_address = to_checksum_address( transaction[ "from" ] )
         txn = transaction[ "hash" ] #"0x373391d6e199990fc6206644ff15d09b027036cf49ff2cd19ef87a3e2a09c0ec"
+        if sliced is not None :
+            if txn not in sliced :
+                continue
+
         try :
             func, params = blockutil.get_transaction( config_object, txn ) 
         except Exception as e :

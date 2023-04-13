@@ -193,6 +193,27 @@ def get_contract_transactions_from_etherscan( config_object, contract_address=No
 
 
 ###########################################################################
+# get abi given contract address
+# - uses etherscan's api 
+###########################################################################
+
+def get_abi_from_etherscan( config_object, contract_address=None ) :
+    if contract_address is None :
+        contract_address = config_object[ "contract_address" ]
+
+    contract_address = to_checksum_address( contract_address )
+
+    transaction_url = "https://api.etherscan.io/api?module=contract&action=getabi&address=%s&apikey=%s"
+    url = transaction_url % ( contract_address, config_object[ "etherscan_key" ] )
+    response = urlopen( url )
+    data_json = json.loads( response.read() )
+
+    return_value = json.loads( data_json[ "result" ] )
+
+    return return_value
+
+
+###########################################################################
 # main - where the magic happens 
 ###########################################################################
 

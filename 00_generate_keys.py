@@ -49,10 +49,10 @@ if __name__ == "__main__" :
 
     # generate seed
     res = {}
-    res[ "seed" ]     = bip39.generate_seed()
+    res[ "seed" ]     = bip39.generate_seed( verbose=True )
 
     # get address from seed 
-    res[ "address" ]  = bip32.get_address_from_seed( res[ "seed" ] )
+    res[ "address" ]  = bip32.get_address_from_seed( res[ "seed" ], verbose=False )
 
     # get balance at address
     res[ "balance" ]  = blockutil.get_eth_balance( config_object, res[ "address" ] )
@@ -60,7 +60,7 @@ if __name__ == "__main__" :
     print( json.dumps( res, indent=2 ) )
 
 
-    res2 = {}
-    res2[ "seed" ] = "500302cc2d4374934e5a62fbd20225e930f1c328097ce9c5eb84bf748bcffc6a"
-    res2[ "address" ] = bip32.get_address_from_seed( res2[ "seed" ] )
-    print( json.dumps( res2, indent=2 ) )
+#    res2 = {}
+#    res2[ "seed" ] = "500302cc2d4374934e5a62fbd20225e930f1c328097ce9c5eb84bf748bcffc6a"
+#    res2[ "address" ] = bip32.get_address_from_seed( res2[ "seed" ] )
+#    print( json.dumps( res2, indent=2 ) )

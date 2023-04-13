@@ -255,9 +255,9 @@ def get_address( private_key, verbose=False ) :
 # get public key from seed
 ###########################################################################
 
-def get_address_from_seed( seed ) :
-    private_key = get_private_key( seed )
-    public_key  = get_address( private_key )
+def get_address_from_seed( seed, verbose=False ) :
+    private_key = get_private_key( seed, verbose=verbose )
+    public_key  = get_address( private_key, verbose=verbose )
     return public_key
 
 

@@ -157,8 +157,9 @@ def generate_seed_from_mnemonic( mnemonic_string, verbose=False ) :
 # generates mnemonic, gets seed from mnemonic 
 ###########################################################################
 
-def generate_seed() :
+def generate_seed( verbose=False ) :
     mnemonic_string = generate_mnemonic()
+    if verbose : print( mnemonic_string )
     return_value = generate_seed_from_mnemonic( mnemonic_string )
     return return_value
 
