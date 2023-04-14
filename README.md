@@ -19,4 +19,4 @@ We have referenced the code above to perform some useful operations.  Scripts pr
 ## Installation
 After cloning the repository, you will need to install the necessary python modules:
 
-> pip install -r requirements.txt
+> `pip install -r requirements.txt`
