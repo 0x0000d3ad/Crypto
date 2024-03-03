@@ -9,6 +9,9 @@
 # usage         : python 01_eth_gas_price.py
 #
 # description   :
+#  example usage :
+#  > python3 01_eth_gas_price.py --get-ethereum-gas-price --mainnet
+#  > python3 01_eth_gas_price.py --monitor-ethereum-gas-price --mainnet
 #
 ###########################################################################
 

@@ -9,6 +9,9 @@
 # usage         : python 00_generate_keys.py
 #
 # description   :
+#  example usage :
+#  > python3 00_generate_keys_and_balances.py --ethereum-wallet-from-mnemonic --mainnet
+#  > python3 00_generate_keys_and_balances.py --create-ethereum-wallet --mainnet
 #
 ###########################################################################
 

@@ -9,6 +9,8 @@
 # usage         : python3 02_send_eth.py
 #
 # description   :
+#  example usage : 
+#  > python3 02_send_eth.py --send-eth --from-account 0 --to-address 0x60d4d112c227D9eB812e02BFAa06ea198B863651 --ether-amount 0.1 --verbose
 #
 ###########################################################################
 
