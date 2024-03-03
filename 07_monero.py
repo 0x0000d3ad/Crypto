@@ -9,6 +9,7 @@
 # usage         : python3 monero.py
 #
 # description   :
+# NOTE: EXPERIMENTAL!
 # > https://monero-python.readthedocs.io/en/latest/index.html
 #
 ###########################################################################
