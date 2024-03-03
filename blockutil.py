@@ -46,7 +46,7 @@ def get_web3( infura_url, verbose=False ) :
 
 
 ###########################################################################
-# get web3 instance and check connection 
+# get ERC contract 
 ###########################################################################
 
 def get_contract( web3, contract_address, abi, verbose=False ) :
@@ -192,13 +192,6 @@ def send_token( web3, chain_id, account, to_address, ether_amount, contract, ver
         sys.exit()
 
     return web3.to_hex( tx_hash )
-
-
-###########################################################################
-# get erc 721 tokens that have been minted
-# - must have contract abi and address
-# - contract must contain totalSupply function
-###########################################################################
 
 
 ###########################################################################
