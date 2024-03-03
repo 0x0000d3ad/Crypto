@@ -1,8 +1,10 @@
 {
-	"infura_url" : "https://mainnet.infura.io/v3/<key>",
-	"contract_address" : "0x1821D56D2f3BC5a5ABA6420676A4bbCBCCb2F7fd",
-	"abi_filename" : "data/dankbots_abi.json",
-	"etherscan_key" : "",
-	"rinkeby_infura_url" : "",
-	"output_filename" : "data/holders_dankbots.txt"
+  "mainnet_infura_url": "",
+  "mainnet_chain_id": "",
+  "testnet_infura_url": "",
+  "testnet_chain_id": "",
+  "contract_address": "",
+  "abi_filename": "",
+  "etherscan_key": "",
+  "output_filename": ""
 }

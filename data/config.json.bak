@@ -1,0 +1,10 @@
+{
+	"mainnet_infura_url" : "https://mainnet.infura.io/v3/6dbd03ea3e1c45a5abcfb7090c5681b7",
+	"mainnet_chain_id" : 1,
+	"testnet_infura_url" : "https://goerli.infura.io/v3/6dbd03ea3e1c45a5abcfb7090c5681b7",
+	"testnet_chain_id" : 5,
+	"contract_address" : "0x1821D56D2f3BC5a5ABA6420676A4bbCBCCb2F7fd",
+	"abi_filename" : "data/dankbots_abi.json",
+	"etherscan_key" : "",
+	"output_filename" : "data/holders_dankbots.txt"
+}

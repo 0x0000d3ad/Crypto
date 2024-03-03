@@ -9,6 +9,7 @@
 # usage         : import blockutil 
 #
 # description   :
+# > https://ethereum.stackexchange.com/questions/91148/error-processing-transaction-request-already-known
 #
 ###########################################################################
 
@@ -26,6 +27,31 @@ from web3 import HTTPProvider, Web3
 from web3.auto import w3
 from web3.contract import Contract
 
+GAS_SEND_TOKEN = 22000
+
+
+###########################################################################
+# get web3 instance and check connection 
+###########################################################################
+
+def get_web3( infura_url, verbose=False ) :
+    web3 = Web3( Web3.HTTPProvider( infura_url ) )
+    conn = web3.is_connected()
+    if conn : 
+        if verbose : print( "--> Web3 instance is connected" )
+    else :
+        print( "--> Error: Web3 instance is not connected; Exiting..." )
+        sys.exit()
+    return web3
+
+
+###########################################################################
+# get web3 instance and check connection 
+###########################################################################
+
+def get_contract( web3, contract_address, abi, verbose=False ) :
+    return web3.eth.contract( address=contract_address, abi=abi )
+
 
 ###########################################################################
 # get current eth gas prices
@@ -34,79 +60,145 @@ from web3.contract import Contract
 #   https://ethgasstation.info/
 ###########################################################################
 
-def get_eth_gas_price( config_object ) :
-
-    # configure web3 from infura link
-    infura_url = config_object[ "infura_url" ] 
-    web3 = Web3( Web3.HTTPProvider( infura_url ) )
-
-    # request json data from eth gas station
-    req = requests.get( 'https://ethgasstation.info/json/ethgasAPI.json' )
-    gas_prices = json.loads(req.content)
-
-    # get actual gas prices right now
-    gas_price1 = web3.eth.gasPrice
-    gas_price_adj = gas_price1 / 10 ** 8
-
-    gas_prices[ "actual" ] = gas_price_adj
-
-    return gas_prices
+def get_eth_gas_price( web3 ) :
+    web3.eth.fee_history(20,'pending',[20,50,80])
+    res = web3.eth.get_block('pending').baseFeePerGas
+    return res
 
 
 ###########################################################################
 # get ethereum balance at address
 ###########################################################################
 
-def get_eth_balance( config_object, address ) :
-
-    # configure web3 from infura link
-    infura_url = config_object[ "infura_url" ] 
-    web3 = Web3( Web3.HTTPProvider( infura_url ) )
+def get_eth_balance( web3, address, ether=True ) :
 
     # get ether balance at address
-    return_value = web3.eth.getBalance( address )
+    if ether :
+        return_value = web3.from_wei( web3.eth.get_balance( address ), 'ether' )
+    else :
+        return_value = web3.eth.get_balance( address )
 
     return return_value
+
+
+###########################################################################
+# get token balance at address 
+###########################################################################
+
+def get_tokenbalance( web3, address, contract, ether=True ) :
+
+    if ether :
+        return_value = web3.from_wei( contract.call().balanceOf( address ), 'ether' )
+    else :
+        return_value = contract.call().balanceOf( address )
+
+    return return_value
+
 
 
 ###########################################################################
 # send ethereum to address, returns tx hash
 ###########################################################################
 
-def send_ethereum( config_object, eth_amount, from_account, to_account, verbose=False ) :
+def send_eth( web3, chain_id, account, to_address, ether_amount, verbose=False ) :
 
-    # configure web3 from infura link
-    infura_url = config_object[ "infura_url" ] 
-    web3 = Web3( Web3.HTTPProvider( infura_url ) )
+    # Set up the addresses to send from and to
+    from_private_key = account[ "private_key" ]
+    from_address = account[ "address" ] 
 
-    abi = []
-    with open( config_object[ "abi_filename" ], 'r' ) as f :
-        abi = json.load( f )
+    # Convert to checksumadress (not to loose bites when sending)
+    to_address_checksum   = to_checksum_address( to_address )
+    from_address_checksum = to_checksum_address( from_address )
 
-    mnemonic_string  = ""
-    with open( '.secret', 'r' ) as f :
-        mnemonic_string = f.read().strip()
- 
-    nonce = w3.eth.getTransactionCount( from_account )
-    
-    transaction = {
+    # Set up the nonce
+    nonce = web3.eth.get_transaction_count( from_address_checksum, 'pending' ) # 'pending' solves error {'code': -32000, 'message': 'already known'} 
+    balance = get_eth_balance( web3, from_address_checksum, ether=True )
+    if verbose :
+        print( f"--> nonce: {nonce}" )
+        print( f"--> balance: {balance}" )
+
+    try :
+        gas_price = get_eth_gas_price( web3 )
+    except :
+        gas_price = web3.to_wei( 50, 'gwei' )
+
+    # Set up the transaction
+    tx = {
         'nonce': nonce,
-        'to': to_account,
-        'value': w3.toWei( eth_amount, 'ether' ),
-        'gas': 2000000,
-        'gasPrice': w3.toWei( '50', 'gwei' ),
+        'to': to_address_checksum,
+        'value' : web3.to_wei( str( ether_amount ), 'ether' ),
+        'gas': GAS_SEND_TOKEN,
+        'gasPrice': gas_price,
+        'chainId' : chain_id
     }
 
-    if verbose : print( "--> Get private key to sign transaction" )
-    seed = bip39.generate_seed_from_mnemonic( mnemonic_string )
-    private_key = bip32.get_private_key( seed )
-    if verbose : print( "--> Sign transaction" )
-    signed_txn = w3.eth.account.signTransaction( transaction, private_key )
+    signed_tx = web3.eth.account.sign_transaction( tx, from_private_key )
 
-    tx_hash = w3.eth.sendRawTransaction( signed_txn.rawTransaction )
-    if verbose : print( w3.toHex( tx_hash ) )
+    try :
+        tx_hash = web3.eth.send_raw_transaction( signed_tx.rawTransaction )
+    except Exception as e :
+        print( "--> Error in transaction" )
+        print( e )
+        print( "--> Exiting..." )
+        sys.exit()
 
-    return tx_hash
+    return web3.to_hex( tx_hash )
+
+
+###########################################################################
+# send token to address, returns tx hash
+###########################################################################
+
+def send_token( web3, chain_id, account, to_address, ether_amount, contract, verbose=False ) :
+
+    # Set up the addresses to send from and to
+    from_private_key = account[ "private_key" ]
+    from_address = account[ "address" ] 
+
+    # Convert to checksumadress (not to loose bites when sending)
+    to_address_checksum   = to_checksum_address( to_address )
+    from_address_checksum = to_checksum_address( from_address )
+
+    # convert eth amount
+    raw_amount = web3.to_wei( str( ether_amount ), 'ether' )
+
+    # Set up the nonce
+    nonce = web3.eth.get_transaction_count( from_address_checksum, 'pending' ) # 'pending' solves error {'code': -32000, 'message': 'already known'} 
+    if verbose :
+        print( f"--> nonce: {nonce}" )
+
+    try :
+        gas_price = get_eth_gas_price( web3 )
+    except :
+        gas_price = web3.to_wei( 50, 'gwei' )
+
+    # Set up the transaction
+    tx = {
+        'nonce': nonce,
+        'gas': GAS_SEND_TOKEN,
+        'gasPrice': gas_price,
+        'chainId' : chain_id
+    }
+
+    txn = contract.functions.transfer( to_address_checksum, raw_amount ).build_transaction( tx )
+    signed_txn = web3.eth.account.sign_transaction( txn, from_private_key )
+
+    try :
+        tx_hash = w3.eth.send_raw_transaction( signed_txn.rawTransaction )
+    except Exception as e :
+        print( "--> Error in transaction" )
+        print( e )
+        print( "--> Exiting..." )
+        sys.exit()
+
+    return web3.to_hex( tx_hash )
+
+
+###########################################################################
+# get erc 721 tokens that have been minted
+# - must have contract abi and address
+# - contract must contain totalSupply function
+###########################################################################
 
 
 ###########################################################################

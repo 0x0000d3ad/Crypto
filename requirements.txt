@@ -1,3 +1,4 @@
+cryptography
 base58
 bip32utils
 bitarray
@@ -6,6 +7,7 @@ ecdsa
 ethtoken
 eth-utils
 mnemonic
+pycryptodome
 pyetherbalance
 secrets
 web3

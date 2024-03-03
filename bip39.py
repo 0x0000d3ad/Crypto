@@ -27,14 +27,13 @@ from hashlib import pbkdf2_hmac, sha256
 # generate entropy, private key, and return the corresponding  mnemonic
 ###########################################################################
 
-def generate_mnemonic( verbose=False ) :
+def generate_mnemonic( verbose=False, entropy_bit_size=128 ) :
 
     # Generate entropy
     #
     # A random number between 128 and 256 bits. Must be a multiple of 32.
     
     # valid_entropy_bit_sizes = [128, 160, 192, 224, 256]
-    entropy_bit_size = 128
     entropy_bytes = os.urandom( entropy_bit_size // 8 )
     
     if verbose : print( entropy_bytes )
@@ -167,6 +166,25 @@ def generate_seed( verbose=False ) :
 ###########################################################################
 # main - where the magic happens
 ###########################################################################
-
 if __name__ == "__main__" :
-    generate_seed()
+    import argparse
+
+    parser = argparse.ArgumentParser( description='BIP32 tools' )
+    parser.add_argument( '-v', '--verbose',            help='Enable verbose mode',         action='store_true' )
+    parser.add_argument( '-s', '--seed',               help='Generate seed',               action='store_true' )
+    parser.add_argument( '-M', '--seed-from-mnemonic', help='Generate seed from mnemonic', action='store_true' )
+    parser.add_argument( '-m', '--mnemonic',           help='Generate mnemonic',           action='store_true' )
+    parser.add_argument( '-e', '--entropy-bit-size',   help='Entropy bit size',            action='store', type=int, default=128 )
+    args = parser.parse_args()
+
+    with open( ".secret" ) as f :
+        mnemonic_string = f.read().strip()
+
+    if args.seed :
+        print( generate_seed() )
+
+    if args.mnemonic :
+        print( generate_mnemonic( entropy_bit_size=args.entropy_bit_size ) )
+
+    if args.seed_from_mnemonic :
+        print( generate_seed_from_mnemonic( mnemonic_string, verbose=args.verbose ) )
