@@ -82,6 +82,17 @@ def get_eth_balance( web3, address, ether=True ) :
 
 
 ###########################################################################
+# get bitcoin balance at address
+###########################################################################
+
+def get_btc_balance( addr ) :
+
+    return_value = requests.get(f"https://blockstream.info/api/address/{addr}").json()
+
+    return return_value
+
+
+###########################################################################
 # get token balance at address 
 ###########################################################################
 

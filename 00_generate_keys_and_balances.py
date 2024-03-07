@@ -23,6 +23,28 @@ import datetime
 import json
 
 
+def print_eth_balances( res ) :
+    for row in res[ "accounts" ] :
+        # get balance at address
+        row[ "balance" ]  = str( blockutil.get_eth_balance( web3, row[ "address" ] ) )
+
+    try : 
+        print( json.dumps( res, indent=2 ) )
+    except :
+        pass
+
+
+def print_btc_balances( res ) :
+    for row in res[ "accounts" ] :
+        # get balance at address
+        row[ "balance" ]  = blockutil.get_btc_balance( row[ "address" ] )
+
+    try : 
+        print( json.dumps( res, indent=2 ) )
+    except :
+        pass
+
+
 if __name__ == "__main__" :
     import argparse
 
@@ -30,7 +52,9 @@ if __name__ == "__main__" :
     parser.add_argument( '-v', '--verbose',  help='Enable verbose mode',                                                     action='store_true' )
     parser.add_argument( '-3', '--bip32',  help='BIP32, default is BIP44 (hardened)',                                        action='store_true' )
     parser.add_argument( '-e', '--ethereum-wallet-from-mnemonic', help='EVM compatible keys from .secret passphrase',        action='store_true' )
+    parser.add_argument( '-b', '--bitcoin-wallet-from-mnemonic',  help='Bitcoin compatible passphrase, keys, and address',   action='store_true' )
     parser.add_argument( '-E', '--create-ethereum-wallet', help='Generate EVM compatible passphrase, keys, and address',     action='store_true' )
+    parser.add_argument( '-B', '--create-bitcoin-wallet',  help='Generate Bitcoin compatible passphrase, keys, and address', action='store_true' )
     parser.add_argument( '-m', '--mainnet', help='Use mainnet instead of testnet',                                           action='store_true' )
     args = parser.parse_args()
 
@@ -51,15 +75,16 @@ if __name__ == "__main__" :
 
     if args.ethereum_wallet_from_mnemonic :
         res = bip32.create_eth_keys_address_from_mnemonic( mnemonic_string, bip44=bip44, verbose=args.verbose )
+        print_eth_balances( res )
+
+    if args.bitcoin_wallet_from_mnemonic :
+        res = bip32.create_btc_keys_address_from_mnemonic( mnemonic_string, bip44=bip44, verbose=args.verbose )
+        print_btc_balances( res )
 
     if args.create_ethereum_wallet :
         res = bip32.create_eth_keys_address_mnemonic( bip44=bip44, verbose=args.verbose )
+        print_eth_balances( res )
 
-    for row in res[ "accounts" ] :
-        # get balance at address
-        row[ "balance" ]  = str( blockutil.get_eth_balance( web3, row[ "address" ] ) )
-
-    try : 
-        print( json.dumps( res, indent=2 ) )
-    except :
-        pass
+    if args.create_bitcoin_wallet :
+        res = create_btc_keys_address_mnemonic( bip44=bip44, verbose=args.verbose )
+        print_btc_balances( res )
